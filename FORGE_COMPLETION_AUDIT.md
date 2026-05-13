@@ -70,10 +70,20 @@ Generated: 2026-05-13
 | Resend transactional email | Deferred | Emails silently skipped, logged to console |
 | Google OAuth | Deferred | Credentials auth is the zero-config baseline |
 
+## Deployment Reliability Fixes (added 2026-05-13)
+
+| Fix | Implementation |
+|---|---|
+| Health check endpoint | `src/app/api/health/route.ts` — GET `/api/health` returns `{"ok":true,"service":"earkit"}` |
+| Server action probe suppression | `src/proxy.ts` — Next.js 16 proxy intercepts POST requests with `Next-Action` header before action handler runs, preventing spurious error logs from deployment health check probes |
+| Dockerfile public dir ownership | `Dockerfile` line 31 — added `--chown=nextjs:nodejs` to public dir COPY |
+
 ## Build Verification
 
 - `npm run build`: ✅ passes with 0 TypeScript errors, 0 lint errors
-- All 31 routes compiled successfully
+- All 32 routes compiled (including `/api/health`) + Proxy recognized
 - Dev server: ✅ starts on port 3000
-- Route smoke tests: `/`, `/pricing`, `/ear-training-for-guitar`, `/blog/why-ear-training-apps-feel-like-homework`, `/login` — all 200 OK
+- Route smoke tests: `/`, `/pricing`, `/ear-training-for-guitar`, `/blog/why-ear-training-apps-feel-like-homework`, `/login`, `/api/health` — all 200 OK
+- Auth routes redirect unauthenticated visitors: `/app`, `/app/settings`, `/app/stats` — all 307
 - DB seed: ✅ 104 drill items seeded (40 interval, 40 chord quality, 24 progression)
+- Production standalone server: ✅ starts correctly, no error logs from server action probes
