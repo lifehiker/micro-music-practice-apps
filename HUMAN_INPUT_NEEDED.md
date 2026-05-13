@@ -63,3 +63,11 @@ For production, generate a secure secret:
 openssl rand -base64 32
 ```
 Set this as `AUTH_SECRET` in your deployment environment. A default is baked into the Dockerfile for zero-config local testing only.
+
+## NEXTAUTH_URL (required for correct auth redirects in production)
+
+Set this to your app's public URL so NextAuth can construct correct callback URLs:
+```
+NEXTAUTH_URL=https://yourdomain.com
+```
+The Dockerfile CMD will automatically derive this from `NEXT_PUBLIC_APP_URL` if `NEXTAUTH_URL` is not explicitly set, so setting `NEXT_PUBLIC_APP_URL` in your deployment env is sufficient.
